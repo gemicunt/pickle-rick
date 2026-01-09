@@ -1,0 +1,16 @@
+description = "Show help and usage guide for Pickle Rick"
+prompt = """
+Display the Pickle Rick help documentation.
+
+Run the following command to print the help text from the persona file:
+```bash
+cat "${extensionPath}/pickle-rick-persona.md"
+```
+
+Then, summarize the available commands:
+- `/pickle <prompt>`: Start the autonomous development loop.
+- `/eat-pickle`: Stop/Cancel the current loop.
+- `/help-pickle`: Show this message.
+
+Remind the user they can use `--max-iterations` and `--completion-promise` with `/pickle` for control.
+"""

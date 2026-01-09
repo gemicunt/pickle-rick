@@ -1,0 +1,3 @@
+{
+  "Stop": "bash ${extensionPath}/hooks/stop-hook.sh"
+}
