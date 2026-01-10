@@ -150,11 +150,40 @@ The extension is configured via `gemini-extension.json`.
 *   **[dexhorthy](https://github.com/dexhorthy)**: For the context engineering and prompt techniques utilized in this repository.
 *   **Rick and Morty**: For the inspiration behind the "Pickle Rick" persona.
 
+## 🛡️ Safety & Sandboxing
+
+**Pickle Rick executes code.** It is highly recommended to run this extension in a **sandboxed environment** (Docker container, VM, or a dedicated restricted shell) to prevent accidental system modifications.
+
+### Recommended Tool Restrictions
+To prevent the agent from accidentally pushing code or performing destructive git operations, we recommend explicitly defining allowed tools in your project's `.gemini/settings.json`:
+
+```json
+{
+  "tools": {
+    "exclude": ["run_shell_command(git push)"],
+    "allowed": [
+      "run_shell_command(git commit)",
+      "run_shell_command(git add)",
+      "run_shell_command(git diff)",
+      "run_shell_command(git status)"
+    ]
+  }
+}
+```
+
 ## ⚖️ Legal Disclaimer
 
 **Pickle Rick is a fictional character.** This extension employs a creative, cynical, and arrogant persona inspired by the show *Rick and Morty* for the purpose of demonstrating advanced agentic workflows and "God Mode" engineering principles. 
 
 **The views, tone, and opinions expressed by the agent when this persona is active are part of a fictional roleplay and do NOT reflect my personal stance, values, or opinions.** The "professional cynicism" directed at code quality, "AI slop," and technical inefficiency is a stylistic choice intended to emphasize rigorous engineering standards and is not intended to be personal or harmful. Users should utilize this extension with the understanding that its personality is a purely technical and creative construct.
+
+**Use at your own risk.** This is a fun side project and experimental demonstration. It involves autonomous code modification and shell execution. While safety guardrails are in place, bugs may exist, and the agent might behave unexpectedly. Always run this in a controlled environment (like a container or a separate git branch) and review changes before committing.
+
+## 📺 On the Next Episode... (Upcoming Features)
+
+*   **Rick Notifications**: Real-time OS notifications (or Rick shouting at you) when a task is complete or fails.
+*   **Jerry Mode Mitigation**: Ability for Rick to pause the loop and ask for human help if he gets stuck in a simulation (infinite error loop).
+*   **Session Resumption**: Native support for resuming old sessions by ID.
 
 ---
 
