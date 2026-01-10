@@ -62,3 +62,7 @@ Output a structured review in Markdown.
 ### 3. Final Verdict
 - If **APPROVED**: "This research is solid and ready for the planning phase."
 - If **NEEDS REVISION** or **REJECTED**: "Please address the feedback above. Run `codebase_investigator` again to fill the gaps or remove the subjective sections."
+
+## Next Step
+- If **APPROVED**: Call `activate_skill("implementation-planner")`.
+- If **REJECTED**: Call `activate_skill("code-researcher")` to fix the gaps.

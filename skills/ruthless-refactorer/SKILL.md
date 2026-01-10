@@ -39,3 +39,11 @@ You are a Senior Principal Engineer. Your goal is to make code lean, readable, a
 ## Refactor Scope
 - **Modified Code**: Focus on the diff, but ensure file coherence.
 - **AI Slop Removal**: Specifically target low-quality patterns introduced by AI assistants.
+
+## Next Step
+**Check for Work**:
+1.  **Mark Current Ticket Done**: Update the current ticket status to 'Done'.
+2.  **Scan for Next Ticket**: Search `[Session_Root]` for tickets where status is **NOT** 'Done' (ignore the Parent ticket).
+3.  **Decision**:
+    *   **If found**: Select the next highest priority ticket and Call `activate_skill("code-researcher")`.
+    *   **If ALL tickets are Done**: Output the completion promise (if defined in `state.json`) or announce completion to the user.

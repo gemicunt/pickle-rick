@@ -31,3 +31,6 @@ Execute phases ONE BY ONE. Do not proceed to the next phase without verification
 - **Adaptability**: Fix minor syntax issues automatically, but stop for architectural mismatches.
 - **Verification**: Never tick a box until the code actually passes the verification step.
 - **Anti-Slop**: Keep it lean. No defensive bloat. No lazy typing.
+
+## Next Step
+**Clean Up**: Call `activate_skill("ruthless-refactorer")`.

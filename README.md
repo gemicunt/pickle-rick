@@ -27,7 +27,7 @@ Pickle Rick is a development methodology based on continuous AI agent loops. **B
 The technique is named after Pickle Rick from Rick and Morty, embodying the philosophy of extreme competence and "God Mode" engineering despite physical limitations.
 
 ### Core Concept
-This plugin implements the loop using a **Stop hook** that intercepts Gemini's exit attempts:
+This plugin implements the loop using a **AfterAgent hook** that intercepts Gemini's exit attempts:
 
 ```bash
 # You run ONCE:
@@ -36,18 +36,35 @@ This plugin implements the loop using a **Stop hook** that intercepts Gemini's e
 # Then Gemini automatically:
 # 1. Works on the task
 # 2. Tries to exit
-# 3. Stop hook blocks exit
-# 4. Stop hook feeds the SAME prompt back
+# 3. AfterAgent hook blocks exit
+# 4. AfterAgent hook feeds the SAME prompt back
 # 5. Repeat until completion
 ```
 
-The loop happens inside your current session - you don't need external bash loops. The Stop hook in `hooks/stop-hook.sh` creates the self-referential feedback loop by blocking normal session exit.
+The loop happens inside your current session - you don't need external bash loops. The AfterAgent hook in `hooks/stop-hook.sh` creates the self-referential feedback loop by blocking normal session exit.
 
 This creates a self-referential feedback loop where:
 - The prompt never changes between iterations (ensuring focus).
 - The agent's previous work persists in files.
 - Each iteration sees modified files and git history.
 - The agent autonomously improves by reading its own past work in files.
+
+### ⚠️ Warning
+**This loop will continue until the task is complete, the `max-iterations` (default: 3) is reached, the `max-time` (default: 60m) expires, or a `completion-promise` is fulfilled.**
+
+## ✅ When to Use Pickle Rick
+
+**Good for:**
+*   Well-defined tasks with clear success criteria.
+*   Tasks requiring iteration and refinement (e.g., getting tests to pass).
+*   Greenfield projects where you can walk away.
+*   Tasks with automatic verification (tests, linters).
+
+**Not good for:**
+*   Tasks requiring human judgment or design decisions.
+*   One-shot operations.
+*   Tasks with unclear success criteria.
+*   Production debugging (use targeted debugging instead).
 
 ## 📋 Prerequisites
 
@@ -63,7 +80,8 @@ To initiate the iterative development loop:
 ```
 
 **Options:**
-- `--max-iterations <N>`: Stop after N iterations.
+- `--max-iterations <N>`: Stop after N iterations (default: 3).
+- `--max-time <M>`: Stop after M minutes (default: 60).
 - `--completion-promise "TEXT"`: Only stop when the agent outputs `<promise>TEXT</promise>`.
 
 ### Stop the Loop

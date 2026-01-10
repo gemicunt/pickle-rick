@@ -6,15 +6,24 @@
 set -euo pipefail
 
 EXTENSION_DIR="$HOME/.gemini/extensions/pickle-rick"
-STATE_FILE="$EXTENSION_DIR/state.json"
+CURRENT_SESSION_POINTER="$EXTENSION_DIR/current_session_path"
 
 # 1. Read Hook Input (JSON from stdin)
 INPUT_JSON=$(cat)
 
-# 2. Check if loop is active
+# 2. Determine State File Path
+if [[ -f "$CURRENT_SESSION_POINTER" ]]; then
+  SESSION_DIR=$(cat "$CURRENT_SESSION_POINTER")
+  STATE_FILE="$SESSION_DIR/state.json"
+else
+  # Fallback (or no session active)
+  STATE_FILE="$EXTENSION_DIR/state.json"
+fi
+
+# 3. Check if loop is active
 if [[ ! -f "$STATE_FILE" ]]; then
   # No state file -> Allow exit
-  echo '{"action": "exit"}'
+  echo '{"decision": "allow"}'
   exit 0
 fi
 
@@ -23,33 +32,46 @@ ACTIVE=$(jq -r '.active // false' "$STATE_FILE" 2>/dev/null || echo "false")
 
 if [[ "$ACTIVE" != "true" ]]; then
   # Not active -> Allow exit
-  echo '{"action": "exit"}'
+  echo '{"decision": "allow"}'
   exit 0
 fi
 
 # 4. Parse Loop State
 ITERATION=$(jq -r '.iteration // 1' "$STATE_FILE")
 MAX_ITERATIONS=$(jq -r '.max_iterations // 0' "$STATE_FILE")
+MAX_TIME_MINS=$(jq -r '.max_time_minutes // 0' "$STATE_FILE")
+START_TIME=$(jq -r '.start_time_epoch // 0' "$STATE_FILE")
 COMPLETION_PROMISE=$(jq -r '.completion_promise // "null"' "$STATE_FILE")
 ORIGINAL_PROMPT=$(jq -r '.original_prompt' "$STATE_FILE")
 
 # 5. Check Termination Conditions
 
-# 5a. Max Iterations
+# 5a. Time Limit
+CURRENT_TIME=$(date +%s)
+ELAPSED_SECONDS=$((CURRENT_TIME - START_TIME))
+MAX_TIME_SECONDS=$((MAX_TIME_MINS * 60))
+
+if [[ "$MAX_TIME_MINS" -gt 0 ]] && [[ "$ELAPSED_SECONDS" -ge "$MAX_TIME_SECONDS" ]]; then
+  # Time limit reached -> Allow exit
+  TMP_STATE=$(mktemp)
+  jq '.active = false' "$STATE_FILE" > "$TMP_STATE" && mv "$TMP_STATE" "$STATE_FILE"
+  echo '{"decision": "allow"}'
+  exit 0
+fi
+
+# 5b. Max Iterations
 if [[ "$MAX_ITERATIONS" -gt 0 ]] && [[ "$ITERATION" -ge "$MAX_ITERATIONS" ]]; then
   # Limit reached -> Allow exit
   # Disable loop
   TMP_STATE=$(mktemp)
   jq '.active = false' "$STATE_FILE" > "$TMP_STATE" && mv "$TMP_STATE" "$STATE_FILE"
-  echo '{"action": "exit"}'
+  echo '{"decision": "allow"}'
   exit 0
 fi
 
 # 5b. Completion Promise
-# Extract the last assistant message from the input transcript
-# The input JSON has "transcript": [...]
-# We filter for role "model" (Gemini)
-LAST_MESSAGE=$(echo "$INPUT_JSON" | jq -r '.transcript | map(select(.role=="model")) | last | .content // ""')
+# Extract the assistant response from the input
+LAST_MESSAGE=$(echo "$INPUT_JSON" | jq -r '.prompt_response // ""')
 
 if [[ "$COMPLETION_PROMISE" != "null" ]] && [[ "$COMPLETION_PROMISE" != "" ]]; then
   if echo "$LAST_MESSAGE" | grep -q "<promise>$COMPLETION_PROMISE</promise>"; then
@@ -57,7 +79,7 @@ if [[ "$COMPLETION_PROMISE" != "null" ]] && [[ "$COMPLETION_PROMISE" != "" ]]; t
     # Disable loop
     TMP_STATE=$(mktemp)
     jq '.active = false' "$STATE_FILE" > "$TMP_STATE" && mv "$TMP_STATE" "$STATE_FILE"
-    echo '{"action": "exit"}'
+    echo '{"decision": "allow"}'
     exit 0
   fi
 fi
@@ -76,11 +98,12 @@ if [[ "$MAX_ITERATIONS" -gt 0 ]]; then
 fi
 
 # Output JSON to prevent exit and send new prompt
+# In Gemini CLI, 'block' decision in AfterAgent forces recursion with 'reason' as the next prompt
 jq -n \
   --arg prompt "$ORIGINAL_PROMPT" \
   --arg feedback "$FEEDBACK" \
   '{ 
-    action: "continue",
-    user_message: $prompt,
-    system_message: $feedback
+    decision: "block",
+    reason: $prompt,
+    systemMessage: $feedback
   }'

@@ -1,3 +1,30 @@
 {
-  "Stop": "bash ${extensionPath}/hooks/stop-hook.sh"
+  "hooks": {
+    "BeforeModel": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "name": "reinforce-pickle-persona",
+            "type": "command",
+            "command": "bash ${extensionPath}/hooks/reinforce-persona.sh",
+            "description": "Injects persona directives to ensure the agent explains its steps"
+          }
+        ]
+      }
+    ],
+    "AfterAgent": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "name": "pickle-rick-loop",
+            "type": "command",
+            "command": "bash ${extensionPath}/hooks/stop-hook.sh",
+            "description": "The Pickle Rick infinite loop mechanism"
+          }
+        ]
+      }
+    ]
+  }
 }

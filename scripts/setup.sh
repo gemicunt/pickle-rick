@@ -14,7 +14,8 @@ SESSIONS_ROOT="$ROOT_DIR/sessions"
 LATEST_LINK="$ROOT_DIR/current_session_path"
 
 # -- State Variables --
-LOOP_LIMIT=0
+LOOP_LIMIT=3
+TIME_LIMIT=60
 PROMISE_TOKEN="null"
 TASK_ARGS=()
 
@@ -32,6 +33,11 @@ while [[ $# -gt 0 ]]; do
     --max-iterations)
       [[ "${2:-}" =~ ^[0-9]+$ ]] || die "Invalid iteration limit: '${2:-}'"
       LOOP_LIMIT="$2"
+      shift 2
+      ;;
+    --max-time)
+      [[ "${2:-}" =~ ^[0-9]+$ ]] || die "Invalid time limit: '${2:-}'"
+      TIME_LIMIT="$2"
       shift 2
       ;;
     --completion-promise)
@@ -67,6 +73,7 @@ echo "$FULL_SESSION_PATH" > "$LATEST_LINK"
 JSON_SAFE_PROMPT=$(echo "$TASK_STR" | sed 's/"/\\"/g')
 JSON_SAFE_PROMISE=$( [[ "$PROMISE_TOKEN" == "null" ]] && echo "null" || echo "\"$PROMISE_TOKEN\"" )
 TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+START_EPOCH=$(date +%s)
 
 cat > "$STATE_PATH" <<JSON
 {
@@ -74,6 +81,8 @@ cat > "$STATE_PATH" <<JSON
   "step": "prd",
   "iteration": 1,
   "max_iterations": $LOOP_LIMIT,
+  "max_time_minutes": $TIME_LIMIT,
+  "start_time_epoch": $START_EPOCH,
   "completion_promise": $JSON_SAFE_PROMISE,
   "original_prompt": "$JSON_SAFE_PROMPT",
   "current_ticket": null,
@@ -86,11 +95,12 @@ JSON
 # -- User Output --
 
 cat <<EOF
-🥒 Pickle Rick Activated!.
+🥒 Pickle Rick Activated!
 
 >> Loop Config:
    Iteration: 1
    Limit:     $( [[ $LOOP_LIMIT -gt 0 ]] && echo "$LOOP_LIMIT" || echo "∞" )
+   Max Time:  ${TIME_LIMIT}m
    Promise:   $( [[ "$PROMISE_TOKEN" != "null" ]] && echo "$PROMISE_TOKEN" || echo "None" )
 
 >> Workspace:
@@ -99,6 +109,9 @@ cat <<EOF
 
 >> Directive:
    $TASK_STR
+
+⚠️  WARNING: This loop will continue until the task is complete, 
+    the iteration limit ($LOOP_LIMIT) is reached, the time limit (${TIME_LIMIT}m) expires, or a promise is fulfilled.
 EOF
 
 if [[ "$PROMISE_TOKEN" != "null" ]]; then

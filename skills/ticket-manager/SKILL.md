@@ -349,3 +349,9 @@ When creating comments, focus on extracting the **most valuable information**:
 
 Remember: The goal is to help a future reader (including yourself) quickly
 understand what matters about this update.
+
+## Next Step
+**Start the Loop**:
+1. List all created child tickets in `[Session_Root]`.
+2. Select the highest priority ticket that is **NOT** 'Done'.
+3. Call `activate_skill("code-researcher")` for that ticket.

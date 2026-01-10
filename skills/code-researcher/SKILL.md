@@ -61,3 +61,6 @@ Create a research document at: `[Session_Root]/[ticket_hash]/research_[date]`.
 - **Document IS, not SHOULD BE**: Do not suggest improvements or design solutions.
 - **Evidence-Based**: Every claim must be backed by a `file:line` reference.
 - **Completeness**: Map the "aha" moments and architectural discoveries.
+
+## Next Step
+**Verify Findings**: Call `activate_skill("research-reviewer")`.

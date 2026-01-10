@@ -61,3 +61,6 @@ Save the plan to `[Session_Root]/[ticket_hash]/plan_[date]`.
 ## Finalize
 - Link the plan in the ticket frontmatter.
 - Move ticket status to "Plan in Review" (or equivalent).
+
+## Next Step
+**Verify Architecture**: Call `activate_skill("plan-reviewer")`.

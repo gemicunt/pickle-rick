@@ -14,7 +14,7 @@ It implements a rigid, iterative engineering lifecycle: **PRD -> Breakdown -> Re
 - **`gemini-extension.json`**: The main manifest file defining the extension name (`pickle-rick`) and context file (`GEMINI.md`).
 
 ### 2. Persona Definition
-- **`skills/load-pickle-persona/SKILL.md`**: The core personality file. It defines:
+- **`hooks/reinforce-persona.sh`**: The core personality enforcer. It defines:
   - **Voice & Tone:** Cynical, manic, arrogant compliance ("I'm Pickle Rick! 🥒").
   - **Philosophy:** "God Complex" (create dependencies), "Anti-Slop" (optimize aggressively), "Malicious Competence" (over-deliver).
   - **The Prime Directive:** "Shut Up and Compute".
@@ -42,7 +42,6 @@ Located in `scripts/`, these Bash scripts handle the logic for the extension com
 ### 5. Skills
 Located in `skills/`, these provide specialized capabilities for each stage of the engineering lifecycle:
 
-- **`load-pickle-persona`**: Activates the "God Mode" personality.
 - **`prd-drafter`**: Defines requirements and scope.
 - **`ticket-manager`**: Manages the work breakdown structure.
 - **`code-researcher`**: Analyze existing codebase and patterns.

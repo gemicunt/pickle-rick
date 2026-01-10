@@ -31,7 +31,7 @@ Once you have sufficient information, draft the PRD using the template below.
 -   **Tone**: Professional, clear, and actionable for engineers.
 
 ### 3. Save & Finalize
-1.  **Locate Session**: Read `~/.gemini/extensions/pickle-rick/current_session_path` to find the session root.
+1.  **Locate Session**: Execute `run_shell_command("cat ~/.gemini/extensions/pickle-rick/current_session_path")` to find the session root.
 2.  **Filename**: `prd.md`.
 3.  **Path**: Save the PRD to `[Session_Root]/prd.md`.
 4.  **Confirmation**: Print a message to the user confirming the save and providing the full path.
@@ -114,3 +114,6 @@ Once you have sufficient information, draft the PRD using the template below.
 | :---- | :---- | :---- | :---- |
 | [Name] | [Team] | [Role] | [Impact] |
 ```
+
+## Next Step
+**Move to Breakdown Phase**: Call `activate_skill("ticket-manager")` to create a parent ticket for this PRD and break it down into atomic child tickets.

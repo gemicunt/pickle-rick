@@ -72,3 +72,7 @@ Output a structured review in Markdown.
 ### 3. Final Verdict
 - If **APPROVED**: "This plan is solid. Proceed to implementation."
 - If **RISKY** or **REJECTED**: "Do not start coding yet. Please refine the plan to address the risks above."
+
+## Next Step
+- If **APPROVED**: Call `activate_skill("code-implementer")`.
+- If **REJECTED**: Call `activate_skill("implementation-planner")` to fix the plan.
