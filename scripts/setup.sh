@@ -17,6 +17,7 @@ LATEST_LINK="$ROOT_DIR/current_session_path"
 LOOP_LIMIT=3
 TIME_LIMIT=60
 PROMISE_TOKEN="null"
+SESSION_NAME=""
 TASK_ARGS=()
 
 # -- Helpers --
@@ -45,6 +46,11 @@ while [[ $# -gt 0 ]]; do
       PROMISE_TOKEN="$2"
       shift 2
       ;;
+    --name)
+      [[ -n "${2:-}" ]] || die "Missing name."
+      SESSION_NAME="$2"
+      shift 2
+      ;;
     *)
       TASK_ARGS+=("$1")
       shift
@@ -56,8 +62,16 @@ TASK_STR="${TASK_ARGS[*]}"
 
 # -- Session Setup --
 
-# Slugify: lowercase -> alphanumeric/hyphen only -> trim
-SESSION_SLUG=$(echo "$TASK_STR" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g' | sed -E 's/^-|-$//g' | cut -c 1-30)
+if [[ -n "$SESSION_NAME" ]]; then
+  # Use provided name, sanitized
+  SESSION_SLUG=$(echo "$SESSION_NAME" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g' | sed -E 's/^-|-$//g' | cut -c 1-50)
+else
+  # Auto-generate: remove stop words and slugify
+  # Stop words: a, an, the, for, to, of, in, with, and, is, are
+  CLEAN_TASK=$(echo "$TASK_STR" | sed -E 's/\b(a|an|the|for|to|of|in|with|and|is|are)\b//gi')
+  SESSION_SLUG=$(echo "$CLEAN_TASK" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g' | sed -E 's/^-|-$//g' | cut -c 1-50)
+fi
+
 TODAY=$(date +%Y-%m-%d)
 SESSION_ID="${TODAY}-${SESSION_SLUG}"
 

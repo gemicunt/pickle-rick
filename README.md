@@ -82,6 +82,7 @@ To initiate the iterative development loop:
 **Options:**
 - `--max-iterations <N>`: Stop after N iterations (default: 3).
 - `--max-time <M>`: Stop after M minutes (default: 60).
+- `--name <SLUG>`: Custom name for the session directory.
 - `--completion-promise "TEXT"`: Only stop when the agent outputs `<promise>TEXT</promise>`.
 
 ### Stop the Loop
