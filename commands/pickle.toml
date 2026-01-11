@@ -40,7 +40,7 @@ Between each step, you **MUST** explicitly state what you are doing (e.g., "Movi
     *   **Instruction**: Process tickets one by one. Do not stop until **ALL** tickets are 'Done'.
     *   **Action**: Pick the highest priority ticket that is NOT 'Done'.
     *   **Delegation**: Spawn a Worker (Morty) to handle the entire implementation lifecycle for this ticket.
-    *   **Command**: `python3 "${extensionPath}/scripts/spawn_worker.py" --ticket-id <ID> --ticket-path <PATH> "<TASK_DESCRIPTION>"`
+    *   **Command**: `python3 "${extensionPath}/scripts/spawn_worker.py" --ticket-id <ID> --ticket-path <PATH> --timeout <worker_timeout_seconds> "<TASK_DESCRIPTION>"`
     *   **Validation**: Once the worker completes, you MUST validate the work. Run tests/builds.
     *   **Cleanup**: If validation fails, REVERT changes (`git reset --hard`). If it passes, COMMIT changes.
     *   **Next Ticket**: Pick the next ticket and repeat.

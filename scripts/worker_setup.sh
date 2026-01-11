@@ -35,7 +35,7 @@ cat > "$STATE_PATH" <<JSON
   "step": "research",
   "iteration": 1,
   "max_iterations": 10,
-  "max_time_minutes": 60,
+  "max_time_minutes": 20,
   "start_time_epoch": $START_EPOCH,
   "completion_promise": "I AM DONE",
   "original_prompt": "$JSON_SAFE_PROMPT",

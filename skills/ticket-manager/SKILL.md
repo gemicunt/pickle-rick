@@ -45,35 +45,6 @@ I'll help you create a local Linear ticket from your thoughts document. Please p
 
 Then wait for the user's input.
 
-## Team Workflow & Status Progression
-
-The team follows a specific workflow to ensure alignment before code
-implementation:
-
-**Inbox**
-1. **Triage** → All new tickets start here for initial review.
-2. **Spec Needed** → More detail is needed (problem/solution not clear).
-
-**Backlog / Planning**
-3. **Research Needed** → Ticket requires investigation before plan can be written.
-4. **Research in Progress** → Active research/investigation underway.
-5. **Research in Review** → Research findings under review (optional).
-6. **Ready for Plan** → Research complete, needs implementation plan.
-
-**Active Development**
-7. **Plan in Progress** → Actively writing the implementation plan.
-8. **Plan in Review** → Plan is written and under discussion.
-9. **Ready for Dev** → Plan approved, ready for implementation.
-10. **In Dev** → Active development (coding).
-11. **Code Review** → PR submitted.
-
-**Completed**
-12. **Done** → Completed.
-13. **Canceled** → Abandoned or Duplicate.
-
-**CRITICAL PRINCIPLE**: Review and alignment happen at the **Plan** stage (not PR stage)
-to move faster and avoid rework.
-
 ## Important Conventions
 
 ### Path Mapping for Thoughts Documents
@@ -88,6 +59,14 @@ the `links` frontmatter section:
 ### Default Values
 
 - **Status**: Always create new tickets in "Triage" status.
+  - **Research in Progress** → Active research/investigation underway.
+  - **Research in Review** → Research findings under review.
+  - **Plan in Progress** → Actively writing the implementation plan.
+  - **Plan in Review** → Plan is written and under discussion.
+  - **In Dev** → Active development (coding).
+  - **Code Review** → Code is being reviewed.
+  - **Done** → Completed.
+  - **Canceled** → Abandoned or Duplicate.
 - **Project**: Default to "project" in the frontmatter unless told otherwise.
 - **Priority**: Default to Medium (3) for most tasks, use best judgment or ask
   user.
@@ -96,17 +75,6 @@ the `links` frontmatter section:
   - Medium (3): Standard implementation tasks (default)
   - Low (4): Nice-to-haves, minor improvements
 - **Links**: Use the `links` frontmatter list to attach URLs.
-
-### Automatic Label Assignment
-
-Automatically apply labels based on the ticket content:
-
-- **core**: For tickets about the `core/` directory (the daemon).
-- **cli**: For tickets about `cli/` (or `humanlayer-wui/`).
-- **meta**: For tickets about `commands/`, `thoughts/` tool, or internal docs.
-- **bug**: For tickets describing a defect or crash.
-
-**Note**: `meta` is mutually exclusive with `core`/`cli`. Tickets can have both `core` and `cli`, but not `meta` with either.
 
 ## Ticket Structure
 
@@ -319,7 +287,6 @@ When moving tickets through the workflow:
 
 ## Important Notes
 
-- **Users**: Tag users (`allison`, `dex`, `sundeep`) in descriptions using `@[name]` format.
 - Keep tickets concise but complete - aim for scannable content.
 - All tickets should include a clear "problem to solve".
 - Focus on the "what" and "why", include "how" only if well-defined.

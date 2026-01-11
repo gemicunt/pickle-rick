@@ -63,7 +63,8 @@ def main():
     parser.add_argument("task", help="The task description")
     parser.add_argument("--ticket-id", required=True, help="Ticket ID")
     parser.add_argument("--ticket-path", required=True, help="Path to ticket directory")
-    parser.add_argument("--timeout", type=int, default=300, help="Timeout in seconds")
+    parser.add_argument("--timeout", type=int, default=1200, help="Timeout in seconds")
+    parser.add_argument("--output-format", choices=["text", "json", "stream-json"], default="text", help="Output format for the Gemini CLI")
     
     args = parser.parse_args()
 
@@ -82,6 +83,7 @@ def main():
             "Task": args.task,
             "Ticket": args.ticket_id,
             "Log": session_log,
+            "Format": args.output_format,
             "PID": os.getpid()
         },
         color_name="CYAN",
@@ -90,10 +92,15 @@ def main():
 
     cmd = [
         "gemini",
-        "-d",
-        "-s", "-y",
-        "-p", f'/pickle-worker "{args.task}" --completion-promise "I AM DONE"'
+        "-s", "-y"
     ]
+
+    if args.output_format != "text":
+        cmd.extend(["-o", args.output_format])
+
+    cmd.extend([
+        "-p", f'/pickle-worker "{args.task}" --completion-promise "I AM DONE"'
+    ])
 
     if "PICKLE_WORKER_CMD_OVERRIDE" in os.environ:
         import shlex
