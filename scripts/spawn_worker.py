@@ -22,9 +22,14 @@ def main():
     
     args = parser.parse_args()
 
+    # Handle if user passed the full file path instead of directory
+    ticket_dir = args.ticket_path
+    if ticket_dir.endswith('.md') or (os.path.exists(ticket_dir) and os.path.isfile(ticket_dir)):
+        ticket_dir = os.path.dirname(ticket_dir)
+
     # Ensure ticket directory exists
-    os.makedirs(args.ticket_path, exist_ok=True)
-    session_log = os.path.join(args.ticket_path, "worker_session.log")
+    os.makedirs(ticket_dir, exist_ok=True)
+    session_log = os.path.join(ticket_dir, "worker_session.log")
 
     # Start UI
     width = 90
@@ -57,7 +62,7 @@ def main():
         with open(session_log, "w") as log_file:
             # We run it and wait
             env = os.environ.copy()
-            env["PICKLE_STATE_FILE"] = os.path.join(args.ticket_path, "state.json")
+            env["PICKLE_STATE_FILE"] = os.path.join(ticket_dir, "state.json")
             
             process = subprocess.Popen(
                 cmd,
