@@ -12,12 +12,17 @@ CURRENT_SESSION_POINTER="$EXTENSION_DIR/current_session_path"
 INPUT_JSON=$(cat)
 
 # 2. Determine State File Path
-if [[ -f "$CURRENT_SESSION_POINTER" ]]; then
-  SESSION_DIR=$(cat "$CURRENT_SESSION_POINTER")
-  STATE_FILE="$SESSION_DIR/state.json"
+STATE_FILE="${PICKLE_STATE_FILE:-}"
+if [[ -z "$STATE_FILE" ]]; then
+  if [[ -f "$CURRENT_SESSION_POINTER" ]]; then
+    SESSION_DIR=$(cat "$CURRENT_SESSION_POINTER")
+    STATE_FILE="$SESSION_DIR/state.json"
+  else
+    # Fallback (or no session active)
+    STATE_FILE="$EXTENSION_DIR/state.json"
+  fi
 else
-  # Fallback (or no session active)
-  STATE_FILE="$EXTENSION_DIR/state.json"
+  SESSION_DIR=$(dirname "$STATE_FILE")
 fi
 
 # 3. Check if loop is active

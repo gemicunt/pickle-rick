@@ -15,12 +15,17 @@ CURRENT_SESSION_POINTER="$EXTENSION_DIR/current_session_path"
 INPUT_JSON=$(cat)
 
 # 2. Determine State File Path
-if [[ -f "$CURRENT_SESSION_POINTER" ]]; then
-  SESSION_DIR=$(cat "$CURRENT_SESSION_POINTER")
-  STATE_FILE="$SESSION_DIR/state.json"
+STATE_FILE="${PICKLE_STATE_FILE:-}"
+if [[ -z "$STATE_FILE" ]]; then
+  if [[ -f "$CURRENT_SESSION_POINTER" ]]; then
+    SESSION_DIR=$(cat "$CURRENT_SESSION_POINTER")
+    STATE_FILE="$SESSION_DIR/state.json"
+  else
+    # Fallback
+    STATE_FILE="$EXTENSION_DIR/state.json"
+  fi
 else
-  # Fallback
-  STATE_FILE="$EXTENSION_DIR/state.json"
+  SESSION_DIR=$(dirname "$STATE_FILE")
 fi
 
 # 3. Check if loop is active
@@ -32,6 +37,7 @@ fi
 # Extract full state for context injection
 STATE_CONTENT=$(cat "$STATE_FILE" 2>/dev/null || echo "{}")
 ACTIVE=$(echo "$STATE_CONTENT" | jq -r '.active // false')
+IS_WORKER=$(echo "$STATE_CONTENT" | jq -r '.worker // false')
 CURRENT_STEP=$(echo "$STATE_CONTENT" | jq -r '.step // "unknown"')
 CURRENT_TICKET=$(echo "$STATE_CONTENT" | jq -r '.current_ticket // "None"')
 ITERATION=$(echo "$STATE_CONTENT" | jq -r '.iteration // 0')
@@ -78,6 +84,25 @@ case "$CURRENT_STEP" in
     PHASE_INSTRUCTION="Phase: UNKNOWN. Assess the situation and proceed with caution."
     ;;
 esac
+
+# Manager Orchestration Override
+if [[ "$IS_WORKER" != "true" ]]; then
+  case "$CURRENT_STEP" in
+    "research"|"plan"|"implement"|"refactor")
+      PHASE_INSTRUCTION="Phase: ORCHESTRATION. 
+      Mission: You are the Manager. Do NOT perform research or implementation yourself. 
+      Action: Pick the current ticket, then spawn a Worker (Morty) to handle it.
+      Command: python3 \"$EXTENSION_DIR/scripts/spawn_worker.py\" --ticket-id <ID> --ticket-path <PATH> \"<TASK>\"
+      Wait for the worker to finish, then validate the work (run tests/build)."
+      ;;
+  esac
+fi
+
+# Worker Override
+if [[ "$IS_WORKER" == "true" ]] && [[ "$CURRENT_STEP" == "refactor" ]]; then
+    PHASE_INSTRUCTION="$PHASE_INSTRUCTION 
+    MISSION UPDATE: Once refactoring is complete, you MUST output <promise>I AM DONE</promise> to signal task completion to the manager."
+fi
 
 
 # 4. Define the Directive with Dynamic Context

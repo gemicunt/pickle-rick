@@ -56,12 +56,16 @@ def main():
     try:
         with open(session_log, "w") as log_file:
             # We run it and wait
+            env = os.environ.copy()
+            env["PICKLE_STATE_FILE"] = os.path.join(args.ticket_path, "state.json")
+            
             process = subprocess.Popen(
                 cmd,
                 stdout=log_file,
                 stderr=subprocess.STDOUT,
                 text=True,
-                cwd=os.getcwd() # Run in current repo context
+                cwd=os.getcwd(), # Run in current repo context
+                env=env
             )
             
             # Polling loop with visual feedback
