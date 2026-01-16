@@ -16,6 +16,16 @@ Keep your `sessions/` directory organized.
 /pickle "Implement JWT auth" --name "auth-jwt-migration"
 ```
 
+## 🥒 Under the Hood: The Rick & Morty Architecture
+
+Pickle Rick now operates using a **Manager/Worker** pattern.
+*   **Rick (The Manager):** The main agent. He creates the plan, breaks down tickets, and **audits** the work. He does *not* write the code himself in complex phases.
+*   **Morty (The Worker):** A spawned sub-agent that executes a specific ticket. He runs in a localized loop until the task is done.
+
+### Why this matters to you:
+1.  **Silence is Normal:** The main "Rick" agent might be silent while "Morty" is working in the background.
+2.  **The Audit:** You will see Rick "Judging" the code after Morty finishes. He will run `git diff` and tests to verify the worker's output. If it's "slop," he will revert it and force a retry.
+
 ## 📝 Example Prompts
 
 ### 1. Full-Stack Feature with Verification
@@ -38,19 +48,30 @@ Use this when you have a vague bug report.
 
 ## 🛠️ Session Management
 
-### 1. Monitoring Progress
-You can watch Pickle Rick's "thoughts" in real-time by tailing the state file in your session directory:
+### 1. Monitoring Progress (Rick & Morty)
+You can watch Pickle Rick's "thoughts" in real-time, but to see the *real* coding progress, you need to watch the **Worker (Morty)** logs.
+
+**Watch the Manager (Rick):**
 ```bash
-# Get the current session directory for your project
 SESSION_DIR=$(~/.gemini/extensions/pickle-rick/scripts/get_session.sh)
-# Watch the state
 tail -f "$SESSION_DIR/state.json"
 ```
 
-### 2. Manual Intervention
+**Watch the Worker (Morty):**
+```bash
+# Find and tail the latest worker log in your session
+ls -t ~/.gemini/extensions/pickle-rick/sessions/*/*/*/worker_session_*.log | head -n 1 | xargs tail -f
+```
+
+### 2. Advanced Flags
+*   `--reset`: Resets the iteration count and start time (useful if you manually fixed a stuck loop).
+*   `--paused`: Initialize a session but don't start the loop immediately.
+*   `--worker-timeout <seconds>`: Set a custom timeout for the Morty worker (default: 1200s).
+
+### 3. Manual Intervention
 If Pickle Rick gets stuck in a loop, use `/eat-pickle` to kill the process. You can then manually edit the `state.json` in the session folder to skip a step or change the `current_ticket`.
 
-### 3. Resuming a Session
+### 4. Resuming a Session
 Pickle Rick has native support for resuming sessions. This is useful if a loop was interrupted or if you initialized the session via `/pickle-prd`.
 ```bash
 /pickle --resume
